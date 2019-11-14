@@ -17,8 +17,80 @@ def create_document(doc, emb, index_name):
         'title': doc['title'],
         'text_vector': emb
     }
+def load_dataset_4(path):
+    docs = []
+    count = 0
+    data = parse_data(path)
+    for row in data:
+        doc = {
+            'title': count,
+            'text': ' '.join(row['persona_info'])
+        }
+        docs.append(doc)
+        count += 1
+    return docs
+def parse_data(path):
+    with open(path, 'r', encoding='utf-8') as file:
+        data = []
+        for line in file.readlines():
+            line = line.strip()
 
+            if len(line) == 0:
+                continue
 
+            space_idx = line.find(' ')
+            if space_idx == -1:
+                dialog_idx = int(line)
+            else:
+                dialog_idx = int(line[:space_idx])
+
+            if int(dialog_idx) == 1:
+                data.append({'persona_info': []})
+
+            dialog_line = line[space_idx + 1:].split('\t')
+            dialog_line = [l.strip() for l in dialog_line]
+
+            if dialog_line[0].startswith('your persona:'):
+                persona_info = dialog_line[0].replace('your persona: ', '')
+                data[-1]['persona_info'].append(persona_info)
+
+        return data
+def load_dataset_2(path):
+    docs = []
+    count = 0
+    with open(path, 'r', encoding='utf-8') as file:
+        data = []
+        for line in file.readlines():
+            line = line.strip()
+
+            if len(line) == 0:
+                continue
+
+            space_idx = line.find(' ')
+            if space_idx == -1:
+                dialog_idx = int(line)
+            else:
+                dialog_idx = int(line[:space_idx])
+
+            if int(dialog_idx) == 1:
+                data.append({'persona_info': [], 'dialog': []})
+
+            dialog_line = line[space_idx + 1:].split('\t')
+            dialog_line = [l.strip() for l in dialog_line]
+
+            if dialog_line[0].startswith('your persona:'):
+                persona_info = dialog_line[0].replace('your persona: ', '')
+                data[-1]['persona_info'].append(persona_info)
+                doc = {
+                    'title':count,
+                    'text':persona_info
+                }
+                docs.append(doc)
+            elif len(dialog_line) > 1:
+                data[-1]['dialog'].append(dialog_line[0])
+                data[-1]['dialog'].append(dialog_line[1])
+            count = count + 1
+    return docs
 def load_dataset(path):
     docs = []
     df = pd.read_csv(path)
@@ -42,7 +114,7 @@ def bulk_predict(docs, batch_size=256):
 
 
 def main(args):
-    docs = load_dataset(args.data)
+    docs = load_dataset_2(args.data)
     with open(args.save, 'w') as f:
         for doc, emb in zip(docs, bulk_predict(docs)):
             d = create_document(doc, emb, args.index_name)
