@@ -110,7 +110,7 @@ def load_dataset_3(path):
     docs = []
     with open(path, 'r', encoding='utf-8') as file:
         data = []
-        sentence_counter = 0
+        sentence_counter = 1
         persona_counter = 0
         for line in file.readlines():
             line = line.strip()
@@ -126,6 +126,7 @@ def load_dataset_3(path):
 
             if int(dialog_idx) == 1:
                 persona_counter += 1
+                sentence_counter = 1
                 data.append({'persona_info': [], 'dialog': []})
 
             dialog_line = line[space_idx + 1:].split('\t')
