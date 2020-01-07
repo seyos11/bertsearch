@@ -9,10 +9,13 @@
       "enabled": "true"
     },
     "properties": {
-      "title": {
+      "personaId": {
         "type": "text"
       },
-      "text": {
+      "sentenceId": {
+        "type": "text"
+      },
+      "sentence": {
         "type": "text"
       },
       "text_vector": {
