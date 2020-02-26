@@ -13,8 +13,9 @@ def create_document(doc, emb, index_name):
     return {
         '_op_type': 'index',
         '_index': index_name,
-        'text': doc['text'],
-        'title': doc['title'],
+        'sentence': doc['sentence'],
+        'sentenceId': doc['sentenceId'],
+        'personaId': doc['personaId'],
         'text_vector': emb
     }
 """def load_dataset_5(path):
@@ -112,6 +113,7 @@ def load_dataset_3(path):
         data = []
         sentence_counter = 1
         persona_counter = 0
+        extra_counter = 0
         for line in file.readlines():
             line = line.strip()
 
@@ -146,6 +148,9 @@ def load_dataset_3(path):
                 data[-1]['dialog'].append(dialog_line[0])
                 data[-1]['dialog'].append(dialog_line[1])
             sentence_counter += 1
+            extra_counter += 1
+            if extra_counter > 100:
+                break
         return docs
 def load_dataset_2(path):
     docs = []
@@ -200,7 +205,7 @@ def bulk_predict(docs, batch_size=256):
     """Predict bert embeddings."""
     for i in range(0, len(docs), batch_size):
         batch_docs = docs[i: i+batch_size]
-        embeddings = bc.encode([doc['text'] for doc in batch_docs])
+        embeddings = bc.encode([doc['sentence'] for doc in batch_docs])
         for emb in embeddings:
             yield emb
 

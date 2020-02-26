@@ -5,6 +5,8 @@ from flask import Flask, render_template, jsonify, request
 from elasticsearch import Elasticsearch
 from bert_serving.client import BertClient
 SEARCH_SIZE = 10
+os.environ['INDEX_NAME'] = 'jobsearch'
+print(os.environ['INDEX_NAME'])
 INDEX_NAME = os.environ['INDEX_NAME']
 app = Flask(__name__)
 
@@ -37,7 +39,7 @@ def analyzer():
         body={
             "size": SEARCH_SIZE,
             "query": script_query,
-            "_source": {"includes": ["title", "text"]}
+            "_source": {"includes": ["sentenceId", "personaId", "text"]}
         }
     )
     print(query)
@@ -46,4 +48,4 @@ def analyzer():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='localhost', port=5000)
